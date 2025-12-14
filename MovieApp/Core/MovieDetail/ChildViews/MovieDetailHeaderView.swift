@@ -12,13 +12,11 @@ struct MovieDetailHeaderView: View {
         ZStack(alignment: .bottomLeading) {
             Image("avatar")
                 .resizable()
-                .aspectRatio(contentMode: .fill)
-                .cornerRadius(20)
-                .shadow(radius: 24)
+                .aspectRatio(contentMode: .fit)
                 .overlay(
                     LinearGradient(colors:[
-                        Color("black").opacity(0.2),
-                        Color("black").opacity(1),], startPoint: .top, endPoint: .bottom)
+                        Color("black").opacity(0),
+                        Color("black").opacity(1),], startPoint: .center, endPoint: .bottom)
                 )
                 .clipped()
             
@@ -65,8 +63,7 @@ struct MovieDetailHeaderView: View {
                         .fontWeight(.semibold)
                 }
             }
-            .padding(.leading, 20)
-            .padding(.bottom, 40)
+            .padding()
         }
     }
 }

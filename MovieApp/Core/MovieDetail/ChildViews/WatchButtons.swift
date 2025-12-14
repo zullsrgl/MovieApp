@@ -9,10 +9,7 @@ import SwiftUI
 
 struct WatchButtons: View {
     var body: some View {
-        
-        ZStack(alignment: .leading) {
-            Color("black")
-                .ignoresSafeArea()
+   
             HStack(spacing: 8){
                 
                 Button {
@@ -47,9 +44,7 @@ struct WatchButtons: View {
                         .background(Color("secondary"))
                         .cornerRadius(20)
                 }
-            }
         }
-        .padding(.leading, 16)
     }
 }
 

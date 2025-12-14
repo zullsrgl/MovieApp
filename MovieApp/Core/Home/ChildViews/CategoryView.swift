@@ -23,7 +23,7 @@ struct CategoryView: View {
                 
             
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing:10){
+                LazyHStack(spacing:10){
                     
                     ForEach(1..<20, id: \.self){ movies in
                         MoviView(movieName: "Avatar")
@@ -40,6 +40,7 @@ struct CategoryView: View {
 #Preview {
     CategoryView(categoryName: "Komedi")
 }
+
 struct MoviView: View {
     var movieName: String
     

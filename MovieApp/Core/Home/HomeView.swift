@@ -10,8 +10,9 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                LazyVStack(spacing: 0) {
+                LazyVStack {
                     HeaderView()
+                        .padding()
                     
                     CategoryView(categoryName: "Dram")
                         .padding(.bottom, 20)
@@ -22,13 +23,32 @@ struct HomeView: View {
                 }
                 .padding(.bottom, 20)
             }
-            .scrollContentBackground(.hidden)
             .background(Color("black"))
-            .navigationTitle("Movie App")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.clear, for: .navigationBar)
+            .navigationTitle("Home")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbarBackground(Color("black").opacity(0.5), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar{
+                ToolbarItem(placement: .topBarTrailing){
+                    Button {
+                        
+                    }label: {
+                        Image(systemName: "airplayvideo")
+                            .foregroundColor(.white)
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarLeading){
+                    Button {
+                        
+                    }label: {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.white)
+                    }
+                }
+                
+            }
         }
     }
 }
