@@ -20,7 +20,6 @@ struct DetailView: View {
                     MovieInformation(text: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layoutIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layoutIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout")
                 }
             }
-            //.scrollContentBackground(.hidden)
             .background(Color("black"))
             .navigationTitle("Movie Name")
             .navigationBarTitleDisplayMode(.large)

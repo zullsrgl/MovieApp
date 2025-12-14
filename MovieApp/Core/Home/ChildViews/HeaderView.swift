@@ -9,17 +9,13 @@ import SwiftUI
 
 struct HeaderView: View {
     
-    let posters = [
-        "poster1",
-        "poster2",
-        "poster3"
-    ]
+    var movies: [Movie]
     
     var body: some View {
         
         TabView {
-            ForEach(0..<posters.count, id: \.self) { index in
-
+            ForEach(movies) { movie in
+                
                 ZStack {
                     RoundedRectangle(cornerRadius: 28)
                         .fill(Color.black.opacity(0.9))
@@ -28,15 +24,21 @@ struct HeaderView: View {
                             radius: 12,
                             y: 8
                         )
-
-                    ZStack(alignment: .bottomLeading) {
-
-                        Image("yildiz")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 420)
-                            .clipped()
-
+                    
+                    ZStack(alignment: .leading) {
+                        
+                        AsyncImage(
+                            url: URL(string: "https://image.tmdb.org/t/p/w500\(movie.posterPath ?? "")")
+                        ) { image in
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        } placeholder: {
+                            Color.gray.opacity(0.3)
+                        }
+                        .frame(height: 420)
+                        .clipped()
+                        
                         LinearGradient(
                             colors: [
                                 Color.black.opacity(0.0),
@@ -45,18 +47,19 @@ struct HeaderView: View {
                             startPoint: .top,
                             endPoint: .bottom
                         )
-
+                        
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Yıldızlar Arası")
+                            
+                            Text(movie.title)
                                 .font(.title3)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.white)
-
-                            Text("Lorem ipsum dolor sit amet...")
+                            
+                            Text(movie.overview ?? "")
                                 .font(.footnote)
                                 .foregroundColor(.white)
                                 .lineLimit(2)
-
+                            
                             HStack(spacing: 12) {
                                 Button { } label: {
                                     Label("Watch", systemImage: "play.fill")
@@ -66,7 +69,7 @@ struct HeaderView: View {
                                         .background(Color.white)
                                         .cornerRadius(12)
                                 }
-
+                                
                                 Button { } label: {
                                     Image(systemName: "plus")
                                         .foregroundColor(.black)
@@ -76,8 +79,8 @@ struct HeaderView: View {
                                 }
                             }
                         }
+                        .padding(.top, 200)
                         .padding(.bottom, 40)
-                        .padding(.leading, 20)
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 28))
                 }
@@ -86,11 +89,9 @@ struct HeaderView: View {
         }
         .tabViewStyle(.page(indexDisplayMode: .always))
         .frame(height: 450)
-
-      
     }
 }
 
 #Preview {
-    HeaderView()
+    HeaderView(movies: [])
 }

@@ -6,12 +6,18 @@
 //
 
 import SwiftUI
+
+
 struct HomeView: View {
+    
+    @StateObject private var viewModel = HomeViewModel()
+    
+    
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVStack {
-                    HeaderView()
+                    HeaderView(movies: viewModel.movies)
                         .padding()
                     
                     CategoryView(categoryName: "Dram")
@@ -49,6 +55,9 @@ struct HomeView: View {
                 }
                 
             }
+        }
+        .onAppear{
+            viewModel.fetchPopulerMovie()
         }
     }
 }
