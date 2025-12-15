@@ -70,23 +70,24 @@ enum MovieGenreType: Int, CaseIterable {
     
     var title: String {
         switch self {
-        case .action: return "Aksiyon"
-        case .adventure: return "Macera"
-        case .animation: return "Animasyon"
-        case .comedy: return "Komedi"
-        case .crime: return "Suç"
-        case .documentary: return "Belgesel"
-        case .drama: return "Dram"
-        case .family: return "Aile"
-        case .fantasy: return "Fantastik"
-        case .history: return "Tarih"
-        case .horror: return "Korku"
-        case .music: return "Müzik"
-        case .mystery: return "Gizem"
-        case .romance: return "Romantik"
-        case .sciFi: return "Bilim Kurgu"
-        case .thriller: return "Gerilim"
-        case .war: return "Savaş"
-            case .western: return "Western" }
+        case .action: return "Action"
+        case .adventure: return "Adventure"
+        case .animation: return "Animation"
+        case .comedy: return "Comedy"
+        case .crime: return "Crime"
+        case .documentary: return "Documentary"
+        case .drama: return "Drama"
+        case .family: return "Family"
+        case .fantasy: return "Fantasy"
+        case .history: return "History"
+        case .horror: return "Horror"
+        case .music: return "Music"
+        case .mystery: return "Mystery"
+        case .romance: return "Romance"
+        case .sciFi: return "Science Fiction"
+        case .thriller: return "Thriller"
+        case .war: return "War"
+        case .western: return "Western"
+        }
     }
 }
