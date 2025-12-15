@@ -10,6 +10,7 @@ import SwiftUI
 struct CategoryView: View {
     
     var categoryName: String
+    var movies: [Movie]
     
     var body: some View {
         VStack(alignment: .leading){
@@ -25,8 +26,8 @@ struct CategoryView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing:10){
                     
-                    ForEach(1..<20, id: \.self){ movies in
-                        MoviView(movieName: "Avatar")
+                    ForEach(movies){ movies in
+                        MovieView(movieName: movies.originalTitle ?? movies.title, posterPath: movies.posterPath ?? "")
                     }
                 }
                 .padding(.horizontal, 12)
@@ -38,19 +39,28 @@ struct CategoryView: View {
 }
 
 #Preview {
-    CategoryView(categoryName: "Komedi")
+    CategoryView(categoryName: "Komedi", movies: [])
 }
 
-struct MoviView: View {
+struct MovieView: View {
     var movieName: String
+    var posterPath: String
     
     var body: some View {
         VStack(spacing: 0) {
-            Image("avatar")
-                .resizable()
-                .scaledToFill()
-                .frame(width: 150, height: 200)
-                .clipped()
+            
+            AsyncImage(
+                url: URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)")
+            ) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+            } placeholder: {
+                Color.gray.opacity(0.3)
+            }
+            .frame(width: 150, height: 200)
+            .clipped()
+            
 
             Text(movieName)
                 .font(.title3)

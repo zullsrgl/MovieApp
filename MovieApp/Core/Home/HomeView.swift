@@ -20,12 +20,13 @@ struct HomeView: View {
                     HeaderView(movies: viewModel.movies)
                         .padding()
                     
-                    CategoryView(categoryName: "Dram")
-                        .padding(.bottom, 20)
-                    CategoryView(categoryName: "Komedi")
-                        .padding(.bottom, 20)
-                    CategoryView(categoryName: "Gişe Rekoru Kıranlar")
-                        .padding(.bottom, 20)
+                    ForEach(Array(viewModel.genreMovies.keys), id: \.self) { genre in
+                        CategoryView(
+                            categoryName: genre.title,
+                            movies: viewModel.genreMovies[genre] ?? []
+                        )
+                        .padding()
+                    }
                 }
                 .padding(.bottom, 20)
             }
@@ -57,7 +58,7 @@ struct HomeView: View {
             }
         }
         .onAppear{
-            viewModel.fetchPopulerMovie()
+            viewModel.fetchHomeData()
         }
     }
 }
