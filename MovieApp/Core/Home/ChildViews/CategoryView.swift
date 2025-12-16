@@ -26,8 +26,15 @@ struct CategoryView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing:10){
                     
-                    ForEach(movies){ movies in
-                        MovieView(movieName: movies.originalTitle ?? movies.title, posterPath: movies.posterPath ?? "")
+                    ForEach(movies) { movie in
+                        NavigationLink {
+                            DetailView(movieId: movie.id)
+                        } label: {
+                            MovieView(
+                                movieName: movie.originalTitle ?? movie.title,
+                                posterPath: movie.posterPath ?? ""
+                            )
+                        }
                     }
                 }
                 .padding(.horizontal, 12)

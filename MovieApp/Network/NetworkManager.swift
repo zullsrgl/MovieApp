@@ -70,4 +70,34 @@ class MovieService {
             
         }.resume()
     }
+    
+    
+    func fetchMovieDetails(movieId: Int, completion: @escaping(Result<Movie, Error>) -> Void){
+        
+        let urlString = "\(baseUrl)/movie/\(movieId)?api_key=\(apiKey)&language=tr-TR"
+        
+        guard let url = URL(string: urlString) else { return }
+        
+        URLSession.shared.dataTask(with: url){ data, _ , error in
+            
+            if let error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let data else { return }
+            
+            do {
+                let movie = try JSONDecoder().decode(Movie.self, from: data)
+                DispatchQueue.main.async {
+                    completion(.success(movie))
+                }
+            }
+            catch{
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }.resume()
+    }
 }

@@ -8,38 +8,57 @@
 import SwiftUI
 
 struct MovieDetailHeaderView: View {
+    
+    var movie: Movie
+    
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            Image("avatar")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .overlay(
-                    LinearGradient(colors:[
-                        Color("black").opacity(0),
-                        Color("black").opacity(1),], startPoint: .center, endPoint: .bottom)
-                )
-                .clipped()
-            
-            VStack {
-                Image("avatar")
+            AsyncImage(
+                url: URL(string: "https://image.tmdb.org/t/p/w500\(movie.posterPath ?? "")")
+            ) { image in
+                image
                     .resizable()
-                    .scaledToFill()
-                    .frame(width: 150, height: 200)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .aspectRatio(contentMode: .fit)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(
-                                LinearGradient(
-                                    colors: [Color.white.opacity(0.5), Color.white.opacity(0.1)],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                ),
-                                lineWidth: 4
-                            )
+                        LinearGradient(colors:[
+                            Color("black").opacity(0),
+                            Color("black").opacity(1),], startPoint: .center, endPoint: .bottom)
                     )
                     .clipped()
                 
-                Text("Avatar")
+            } placeholder: {
+                Color.gray.opacity(0.3)
+            }
+         
+            .clipped()
+            
+            VStack(alignment: .leading) {
+                AsyncImage(
+                    url: URL(string: "https://image.tmdb.org/t/p/w500\(movie.posterPath ?? "")")
+                ) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 150, height: 200)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [Color.white.opacity(0.5), Color.white.opacity(0.1)],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    ),
+                                    lineWidth: 4
+                                )
+                        )
+                        .clipped()
+                    
+                } placeholder: {
+                    Color.gray.opacity(0.3)
+                }
+                
+                Text(movie.title)
                     .font(.title2)
                     .foregroundColor(.white)
                     .fontWeight(.semibold)
@@ -48,7 +67,7 @@ struct MovieDetailHeaderView: View {
                     Image(systemName: "star.fill")
                         .foregroundColor(Color("primary"))
                     
-                    Text("4.3")
+                    Text("\(movie.voteAverage ?? 0.0)")
                         .font(.footnote)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
@@ -57,7 +76,7 @@ struct MovieDetailHeaderView: View {
                         .frame(width: 6, height: 6)
                         .foregroundColor(.white)
                     
-                    Text("2024")
+                    Text(movie.releaseDate ?? "-")
                         .font(.footnote)
                         .foregroundColor(.white)
                         .fontWeight(.semibold)
@@ -69,5 +88,5 @@ struct MovieDetailHeaderView: View {
 }
 
 #Preview {
-    MovieDetailHeaderView()
+    MovieDetailHeaderView(movie: Movie(id: 1, title: "", originalTitle: "", overview: "", posterPath: "", backdropPath: "", releaseDate: "", voteAverage: 12.7, voteCount: 2, genreIds: []))
 }

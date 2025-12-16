@@ -8,28 +8,36 @@
 import SwiftUI
 
 struct DetailView: View {
+    
+    var movieId: Int
+    @StateObject private var viewModel = DetailViewModel()
+    
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading) {
-                    MovieDetailHeaderView()
-                    Spacer()
-                    WatchButtons()
-                        .padding(.leading)
-                    Spacer()
-                    MovieInformation(text: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layoutIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layoutIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout")
+                    
+                    if let movie = viewModel.movie {
+                        MovieDetailHeaderView(movie: movie)
+                        Spacer()
+                        WatchButtons()
+                            .padding(.leading)
+                        Spacer()
+                        MovieInformation(text: movie.overview ?? "")
+                    }
                 }
             }
             .background(Color("black"))
-            .navigationTitle("Movie Name")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Color.clear, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
+        }.onAppear{
+            viewModel.fetchMovieDetail(id: movieId)
         }
     }
 }
 
 #Preview {
-    DetailView()
+    DetailView(movieId: 1)
 }
