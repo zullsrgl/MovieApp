@@ -11,6 +11,7 @@ enum Route: Hashable {
     case home
     case detail(movieId: Int)
     case player
+    case search
 }
 
 struct HomeView: View {
@@ -48,6 +49,7 @@ struct HomeView: View {
             }
             .background(Color("black"))
             .navigationTitle("Home")
+            .background(Color("black"))
             .navigationBarTitleDisplayMode(.large)
             .toolbarBackground(Color("black").opacity(0.5), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -63,13 +65,12 @@ struct HomeView: View {
                 }
                 ToolbarItem(placement: .topBarLeading){
                     Button {
-                        
+                        path.append(Route.search)
                     }label: {
                         Image(systemName: "magnifyingglass")
-                            .foregroundColor(.white)
+                            .foregroundColor(Color("white"))
                     }
                 }
-                
             }
             .navigationDestination(for: Route.self) { route in
                 switch route {
@@ -79,7 +80,10 @@ struct HomeView: View {
                     
                 })
                 case .player: VideoView()
-                
+                case .search: SearchView(onClickedPlay:{
+                    path.append(Route.player)
+                })
+                    
                 }
             }
         }

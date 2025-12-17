@@ -100,4 +100,33 @@ class MovieService {
             }
         }.resume()
     }
+    
+    
+    func searchMovies(query: String, completion: @escaping(Result<[Movie], Error>) -> Void) {
+        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        
+        
+        guard let url = URL(string:"\(baseUrl)/search/movie?api_key=\(apiKey)&language=tr-TR&query=\(encodedQuery)") else { return }
+        URLSession.shared.dataTask(with: url) {data ,_ , error in
+            if let error {
+                completion(.failure(error))
+            }
+            guard let data = data else {
+                print("error: search movies fetched")
+                return
+            }
+            
+            do {
+                let movieResults = try JSONDecoder().decode(MovieResponse.self, from: data)
+                DispatchQueue.main.async {
+                    completion(.success(movieResults.results ?? []))
+                }
+            }catch {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+            
+        }.resume()
+    }
 }

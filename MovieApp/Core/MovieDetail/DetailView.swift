@@ -43,5 +43,5 @@ struct DetailView: View {
 }
 
 #Preview {
-    DetailView(movieId: 1, onWatchClicked: {})
+    DetailView(movieId: 2, onWatchClicked: {})
 }
