@@ -9,40 +9,34 @@ import SwiftUI
 import AVKit
 
 struct VideoView: View {
-    var player: AVPlayer! {
-        AVPlayer(url: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4")!)
-        
-    }
+
+    private let player = AVPlayer(url: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4")!)
+ 
     var body: some View {
-        VStack {
-            VideoPlayer(player: player)
-                .ignoresSafeArea()
-            
-                .onAppear{
-                    enterVideoMode()
-                }
-                .onDisappear {
-                    exitVideoMode()
-                }
-        }
+        VideoPlayer(player: player)
+            .ignoresSafeArea()
+            .onAppear {
+                enterVideoMode()
+                player.play()
+            }
+            .onDisappear {
+                exitVideoMode()
+                player.pause()
+            }
     }
-    
-    
+
     private func enterVideoMode() {
         AppDelegate.orientationLock = .landscape
-        UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
+        UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue,forKey: "orientation" )
         UINavigationController.attemptRotationToDeviceOrientation()
-        player.play()
     }
-    
+
     private func exitVideoMode() {
         AppDelegate.orientationLock = .portrait
-        UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
+        UIDevice.current.setValue(  UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
         UINavigationController.attemptRotationToDeviceOrientation()
-        player.pause()
     }
 }
-
 #Preview {
     VideoView()
 }

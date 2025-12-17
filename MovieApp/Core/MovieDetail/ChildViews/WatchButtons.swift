@@ -8,46 +8,30 @@
 import SwiftUI
 
 struct WatchButtons: View {
+
+    let onWatchClicked: () -> Void
     var body: some View {
-   
-        NavigationStack {
-            HStack(spacing: 8){
+        HStack(spacing: 8){
+            
+            Button {
+                onWatchClicked()
+            }label: {
+                Text("Watch")
+                    .padding()
+                    .foregroundColor(Color("black"))
+                    .frame(width: 150, height: 40)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(Color.white, lineWidth: 2)
+                    )
+                    .background(Color("primary"))
+                    .cornerRadius(20)
                 
-                NavigationLink {
-                    VideoView()
-                }label: {
-                    Text("Watch")
-                        .padding()
-                        .foregroundColor(Color("black"))
-                        .frame(width: 150, height: 40)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.white, lineWidth: 2)
-                        )
-                        .background(Color("primary"))
-                        .cornerRadius(20)
-                    
-                }
-                
-                NavigationLink {
-                    VideoView()
-                } label: {
-                    Text("Trailler")
-                        .padding()
-                        .foregroundColor(Color("white"))
-                        .frame(width: 150, height: 40)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.white, lineWidth: 2)
-                        )
-                        .background(Color("secondary"))
-                        .cornerRadius(20)
-                }
             }
         }
     }
 }
 
 #Preview {
-    WatchButtons()
+    WatchButtons(onWatchClicked: {})
 }

@@ -8,22 +8,23 @@
 import SwiftUI
 
 struct HeaderView: View {
-    var movies: [Movie]
+    let movies: [Movie]
+    let onWatchCliked: () ->Void
+    let onDetailCliked: (Int) ->Void
     
     var body: some View {
-        
-        NavigationStack {
-            TabView {
-                ForEach(movies) { movie in
+        TabView {
+            ForEach(movies) { movie in
+                
+                ZStack {
+                    RoundedRectangle(cornerRadius: 28)
+                        .fill(Color.black.opacity(0.9))
                     
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 28)
-                            .fill(Color.black.opacity(0.9))
+                    ZStack(alignment: .leading) {
                         
-                        ZStack(alignment: .leading) {
-                            
+                        if let posterPath = movie.posterPath {
                             AsyncImage(
-                                url: URL(string: "https://image.tmdb.org/t/p/w500\(movie.posterPath ?? "")")
+                                url: URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)")
                             ) { image in
                                 image
                                     .resizable()
@@ -33,62 +34,70 @@ struct HeaderView: View {
                             } placeholder: {
                                 Color.gray.opacity(0.3)
                             }
-                            
-                            VStack(alignment: .leading, spacing: 8) {
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            if let originalTitle = movie.title,
+                               let overview = movie.overview{
                                 
-                                Text(movie.title)
+                                
+                                
+                                Text(originalTitle)
                                     .font(.title3)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.white)
                                 
-                                Text(movie.overview ?? "")
+                                Text(overview)
                                     .font(.footnote)
                                     .font(.system(size: 24))
                                     .lineLimit(3)
                                     .foregroundColor(Color("white"))
-                               
                                 
-                                HStack(spacing: 12) {
-                                    NavigationLink {
-                                        VideoView()
-                                    }
-                                    label: {
-                                        Label("Watch", systemImage: "play.fill")
-                                            .foregroundColor(Color("black"))
-                                            .padding(.horizontal, 18)
-                                            .padding(.vertical, 10)
-                                            .background(Color.white)
-                                            .cornerRadius(12)
+                            }
+                            HStack(spacing: 12) {
+                                
+                                Button {
+                                    onWatchCliked()
+                                }
+                                label: {
+                                    Label("Watch", systemImage: "play.fill")
+                                        .foregroundColor(Color("black"))
+                                        .padding(.horizontal, 18)
+                                        .padding(.vertical, 10)
+                                        .background(Color.white)
+                                        .cornerRadius(12)
+                                }
+                                
+                                Button {
+                                    if let id = movie.id {
+                                        onDetailCliked(id)
                                     }
                                     
-                                    NavigationLink {
-                                        DetailView(movieId: movie.id)
-                                    } label: {
-                                        Label("", systemImage: "arrowshape.right.fill")
-                                            .foregroundColor(Color("black"))
-                                            .padding(.horizontal, 18)
-                                            .padding(.vertical, 10)
-                                            .background(Color.white)
-                                            .cornerRadius(12)
-                                    }
-                                    .buttonStyle(.plain)
+                                } label: {
+                                    Label("", systemImage: "arrowshape.right.fill")
+                                        .foregroundColor(Color("black"))
+                                        .padding(.horizontal, 18)
+                                        .padding(.vertical, 10)
+                                        .background(Color.white)
+                                        .cornerRadius(12)
                                 }
+                                .buttonStyle(.plain)
                             }
-                            .padding()
-                            .padding(.top, 200)
-//                            .padding(.bottom, 40)
                         }
-                        .clipShape(RoundedRectangle(cornerRadius: 28))
+                        .padding()
+                        .padding(.top, 200)
                     }
-                    .padding()
+                    .clipShape(RoundedRectangle(cornerRadius: 28))
                 }
+                .padding()
             }
-            .tabViewStyle(.page(indexDisplayMode: .always))
-            .frame(height: 450)
         }
+        .tabViewStyle(.page(indexDisplayMode: .always))
+        .frame(height: 450)
     }
+    
 }
 
 #Preview {
-    HeaderView(movies: [])
+    HeaderView(movies: [], onWatchCliked: {}, onDetailCliked: {_ in })
 }

@@ -22,7 +22,7 @@ class MovieService {
         
         URLSession.shared.dataTask(with: url) { data, response, error in
             
-            if let error = error {
+            if let error {
                 print("Error: \(error.localizedDescription)")
                 return
             }
@@ -32,7 +32,7 @@ class MovieService {
                 let decodedResponse = try JSONDecoder().decode(MovieResponse.self, from: data)
                 
                 DispatchQueue.main.async {
-                    completion(decodedResponse.results)
+                    completion(decodedResponse.results ?? [])
                 }
                 
             } catch {
@@ -61,7 +61,7 @@ class MovieService {
                 let response = try JSONDecoder().decode(MovieResponse.self, from: data)
                 
                 DispatchQueue.main.async {
-                    completion(.success(response.results))
+                    completion(.success(response.results ?? []))
                 }
                 
             } catch {

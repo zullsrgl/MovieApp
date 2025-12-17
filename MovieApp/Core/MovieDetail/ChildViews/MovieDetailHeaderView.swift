@@ -9,10 +9,11 @@ import SwiftUI
 
 struct MovieDetailHeaderView: View {
     
-    var movie: Movie
+    let movie: Movie
     
     var body: some View {
         ZStack(alignment: .bottomLeading) {
+            
             AsyncImage(
                 url: URL(string: "https://image.tmdb.org/t/p/w500\(movie.posterPath ?? "")")
             ) { image in
@@ -20,21 +21,26 @@ struct MovieDetailHeaderView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .overlay(
-                        LinearGradient(colors:[
-                            Color("black").opacity(0),
-                            Color("black").opacity(1),], startPoint: .center, endPoint: .bottom)
+                        LinearGradient(
+                            colors: [
+                                Color("black").opacity(0),
+                                Color("black").opacity(1)
+                            ],
+                            startPoint: .center,
+                            endPoint: .bottom
+                        )
                     )
-                    .clipped()
-                
             } placeholder: {
                 Color.gray.opacity(0.3)
             }
-         
-            .clipped()
+            
             
             VStack(alignment: .leading) {
+                
+                
                 AsyncImage(
                     url: URL(string: "https://image.tmdb.org/t/p/w500\(movie.posterPath ?? "")")
+                    
                 ) { image in
                     image
                         .resizable()
@@ -56,9 +62,10 @@ struct MovieDetailHeaderView: View {
                     
                 } placeholder: {
                     Color.gray.opacity(0.3)
+                    
                 }
                 
-                Text(movie.title)
+                Text(movie.title ?? "")
                     .font(.title2)
                     .foregroundColor(.white)
                     .fontWeight(.semibold)
@@ -67,7 +74,7 @@ struct MovieDetailHeaderView: View {
                     Image(systemName: "star.fill")
                         .foregroundColor(Color("primary"))
                     
-                    Text("\(movie.voteAverage ?? 0.0)")
+                    Text("\(movie.voteAverage)")
                         .font(.footnote)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
@@ -76,15 +83,18 @@ struct MovieDetailHeaderView: View {
                         .frame(width: 6, height: 6)
                         .foregroundColor(.white)
                     
-                    Text(movie.releaseDate ?? "-")
+                    
+                    Text(movie.releaseDate ?? "")
                         .font(.footnote)
                         .foregroundColor(.white)
                         .fontWeight(.semibold)
+                    
                 }
             }
             .padding()
         }
     }
+    
 }
 
 #Preview {

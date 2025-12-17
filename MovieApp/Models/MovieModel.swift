@@ -9,7 +9,7 @@
 
 struct MovieResponse: Decodable {
     let page: Int?
-    let results: [Movie]
+    let results: [Movie]?
     let totalPages: Int?
     let totalResults: Int?
     
@@ -22,8 +22,8 @@ struct MovieResponse: Decodable {
 }
 
 struct Movie: Decodable, Identifiable {
-    let id: Int
-    let title: String
+    let id: Int?
+    let title: String?
     let originalTitle: String?
     let overview: String?
     let posterPath: String?

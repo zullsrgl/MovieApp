@@ -9,21 +9,25 @@ import SwiftUI
 
 struct DetailView: View {
     
-    var movieId: Int
+    let movieId: Int
+    let onWatchClicked: () -> Void
     @StateObject private var viewModel = DetailViewModel()
     
     var body: some View {
-        NavigationStack {
             ScrollView {
                 VStack(alignment: .leading) {
                     
                     if let movie = viewModel.movie {
                         MovieDetailHeaderView(movie: movie)
                         Spacer()
-                        WatchButtons()
+                        WatchButtons(onWatchClicked: {
+                            onWatchClicked()
+                        })
                             .padding(.leading)
                         Spacer()
-                        MovieInformation(text: movie.overview ?? "")
+                        if let overview = movie.overview {
+                            MovieInformation(text: overview)
+                        }
                     }
                 }
             }
@@ -32,12 +36,12 @@ struct DetailView: View {
             .toolbarBackground(Color.clear, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
-        }.onAppear{
+        .onAppear{
             viewModel.fetchMovieDetail(id: movieId)
         }
     }
 }
 
 #Preview {
-    DetailView(movieId: 1)
+    DetailView(movieId: 1, onWatchClicked: {})
 }

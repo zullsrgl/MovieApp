@@ -9,8 +9,10 @@ import SwiftUI
 
 struct CategoryView: View {
     
-    var categoryName: String
-    var movies: [Movie]
+    let categoryName: String
+    let movies: [Movie]
+    let onItemCliked: (Int) ->Void
+    
     
     var body: some View {
         VStack(alignment: .leading){
@@ -20,20 +22,25 @@ struct CategoryView: View {
                 .foregroundColor(Color("white"))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
-                
-                
             
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing:10){
                     
                     ForEach(movies) { movie in
-                        NavigationLink {
-                            DetailView(movieId: movie.id)
-                        } label: {
+                        
+                        if let originalTitle = movie.originalTitle,
+                           let posterPath = movie.posterPath {
+                            
                             MovieView(
-                                movieName: movie.originalTitle ?? movie.title,
-                                posterPath: movie.posterPath ?? ""
+                                movieName: originalTitle,
+                                posterPath: posterPath
                             )
+                            .onTapGesture {
+                                if let id = movie.id {
+                                    onItemCliked(id)
+                                }
+                                
+                            }
                         }
                     }
                 }
@@ -46,7 +53,7 @@ struct CategoryView: View {
 }
 
 #Preview {
-    CategoryView(categoryName: "Komedi", movies: [])
+    CategoryView(categoryName: "Komedi", movies: [], onItemCliked: {id in})
 }
 
 struct MovieView: View {
@@ -68,7 +75,6 @@ struct MovieView: View {
             .frame(width: 150, height: 200)
             .clipped()
             
-
             Text(movieName)
                 .font(.title3)
                 .foregroundColor(Color("white"))
