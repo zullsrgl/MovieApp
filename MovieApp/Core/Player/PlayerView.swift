@@ -12,7 +12,13 @@ struct PlayerView: View {
     @State private var showControls = true
     @State var isPlaying: Bool = false
     
-     private let player = AVPlayer(
+    @State private var currentTime: Double = 0.0
+    @State private var totalTime: Double =  1
+    
+    @State private var timeObserver: Any?
+    @State private var statusObservation: NSKeyValueObservation?
+    
+    private let player = AVPlayer(
         url: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4")!
     )
     
@@ -29,14 +35,28 @@ struct PlayerView: View {
                 }
             
             if showControls {
-                HStack(spacing: 100) {
-                    CustomPlayerButton(systemName: "gobackward.10") { seek(by: -10) }
-                    
-                    CustomPlayerButton(systemName: isPlaying ? "pause.fill" : "play.fill") {
-                        togglePlay()
+                VStack {
+                    Spacer()
+                    HStack(spacing: 100) {
+                        CustomPlayerButton(systemName: "gobackward.10") { seek(by: -10) }
+                        
+                        CustomPlayerButton(systemName: isPlaying ? "pause.fill" : "play.fill") {
+                            togglePlay()
+                        }
+                        
+                        CustomPlayerButton(systemName: "goforward.10") { seek(by: 10) }
                     }
+                    Spacer()
                     
-                    CustomPlayerButton(systemName: "goforward.10") { seek(by: 10) }
+                    
+                    VideoProgressBar(
+                        totalTime: totalTime,
+                        currentTime: currentTime,
+                        onSeek: { seconds in
+                            let time = CMTime(seconds: seconds, preferredTimescale: 600)
+                            player.seek(to: time)
+                        }
+                    )
                 }
             }
         }
@@ -45,10 +65,34 @@ struct PlayerView: View {
             enterVideoMode()
             player.play()
             isPlaying = true
+            
+            if let duration = player.currentItem?.duration, duration.isNumeric {
+                totalTime = duration.seconds
+            } else {
+                statusObservation = player.currentItem?.observe(\AVPlayerItem.status, options: [.initial, .new]) { item, _ in
+                    if item.status == .readyToPlay, item.duration.isNumeric {
+                        DispatchQueue.main.async {
+                            totalTime = item.duration.seconds
+                        }
+                    }
+                }
+            }
+            
+            let interval = CMTime(seconds: 0.5, preferredTimescale: 600)
+            timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak player] _ in
+                guard let player = player else { return }
+                currentTime = player.currentTime().seconds
+            }
         }
         .onDisappear {
             exitVideoMode()
             player.pause()
+            if let observer = timeObserver {
+                player.removeTimeObserver(observer)
+                timeObserver = nil
+            }
+            statusObservation?.invalidate()
+            statusObservation = nil
         }
     }
     
@@ -60,6 +104,7 @@ struct PlayerView: View {
         }
         isPlaying.toggle()
     }
+    
     
     private func seek(by seconds: Double) {
         let currentTime = player.currentTime()
@@ -79,6 +124,7 @@ struct PlayerView: View {
         UIDevice.current.setValue(  UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
         UINavigationController.attemptRotationToDeviceOrientation()
     }
+    
 }
 #Preview {
     PlayerView()
