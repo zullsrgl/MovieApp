@@ -79,7 +79,7 @@ struct HomeView: View {
                     path.append(Route.player)
                     
                 })
-                case .player: VideoView()
+                case .player: PlayerView()
                 case .search: SearchView(onClickedPlay:{
                     path.append(Route.player)
                 })

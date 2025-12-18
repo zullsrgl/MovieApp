@@ -2,7 +2,7 @@
 //  SearchView.swift
 //  MovieApp
 //
-//  Created by Enes Arabacı on 17.12.2025.
+//  Created by Zülal Sarıoğlu on 17.12.2025.
 //
 
 import SwiftUI
