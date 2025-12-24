@@ -10,8 +10,10 @@ import AVKit
 
 struct PlayerView: View {
     @State private var showControls = true
-    @State var isPlaying: Bool = false
+    @State private var showSpeedMenu = false
+    @State private var selectedRateIndex = 2
     
+    @State var isPlaying: Bool = false
     @State private var currentTime: Double = 0.0
     @State private var totalTime: Double =  1
     
@@ -32,6 +34,11 @@ struct PlayerView: View {
                         showControls.toggle()
                     }
                 }
+            Color("black")
+                .opacity(showControls ? 0.45 : 0)
+                .ignoresSafeArea()
+                .animation(.easeInOut, value: showControls)
+                .allowsHitTesting(false)
             
             if showControls {
                 VStack {
@@ -52,9 +59,22 @@ struct PlayerView: View {
                         onSeek: { seconds in
                             let time = CMTime(seconds: seconds, preferredTimescale: 600)
                             player.seek(to: time)
+                        }, onSpeedTap: {
+                            showSpeedMenu = true
                         }
                     )
+                    if showSpeedMenu {
+                        PlaybackSpeedView(rateIndex: $selectedRateIndex, onSelect: { selectedRate in
+                            player.rate = selectedRate
+                        }, onClose: {
+                            withAnimation {
+                                showSpeedMenu = false
+                            }
+                        })
+                        .transition(.move(edge: .bottom))
+                    }
                 }
+                .transition(.opacity)
             }
         } .onAppear {
             enterVideoMode()

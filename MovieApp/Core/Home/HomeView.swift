@@ -15,8 +15,8 @@ enum Route: Hashable {
 }
 
 struct HomeView: View {
-    @StateObject private var viewModel = HomeViewModel()
     
+    @StateObject private var viewModel = HomeViewModel()
     @State private var path = NavigationPath()
     
     var body: some View {

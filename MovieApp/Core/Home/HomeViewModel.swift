@@ -21,7 +21,6 @@ final class HomeViewModel: ObservableObject{
     
     @MainActor
     private func fetchTopMovies() async {
-        
         do {
             self.movies = try await MovieService.shared.fetchMovies()
         }catch {
