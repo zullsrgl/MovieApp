@@ -37,7 +37,10 @@ struct DetailView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear{
-            viewModel.fetchMovieDetail(id: movieId)
+            
+            Task {
+                 await viewModel.fetchMovieDetail(id: movieId)
+            }
         }
     }
 }

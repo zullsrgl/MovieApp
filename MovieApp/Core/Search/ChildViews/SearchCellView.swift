@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SearchCellView: View {
-    
     let movies: [Movie]
     let onWatchClicked: () -> Void
     
@@ -20,10 +19,7 @@ struct SearchCellView: View {
                     HStack {
                         
                         if let posterPath = movie.posterPath {
-                            
-                        
-                        
-                        AsyncImage(
+                            AsyncImage(
                             url: URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)")
                         ) { image in
                             image
@@ -41,7 +37,7 @@ struct SearchCellView: View {
                         
                         if let title = movie.title {
                             Text(title)
-                            .font(.title2)
+                                .font(.headline)
                             
                             .fontWeight(.semibold)
                             .foregroundColor(Color("white"))

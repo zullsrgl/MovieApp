@@ -10,23 +10,20 @@ import Foundation
 final class SearchViewModel: ObservableObject {
     @Published var movies: [Movie] = []
     
-    func fecthTopMovies() {
+    func fetchTopMovies() async {
         
-        MovieService.shared.fetchMovies { [weak self] movies in
-            self?.movies = movies
+        do {
+            self.movies = try await MovieService.shared.fetchMovies()
+        }catch {
+            print("search view model error")
         }
     }
     
-    func searchMoviesFetched(searchText: String) {
-        MovieService.shared.searchMovies(query: searchText){ [weak self] result in
-            switch result {
-            case .success(let movies):
-                self?.movies = movies
-                
-            case .failure(let error):
-                print("search viewmodel error:\(error) ")
-            }
-            
+    func searchMoviesFetched(searchtext: String) async {
+        do {
+            movies = try await MovieService.shared.searchMovies(query: searchtext)
+        } catch {
+            print("search view model error")
         }
     }
 }

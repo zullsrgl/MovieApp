@@ -19,8 +19,7 @@ struct PlayerView: View {
     @State private var statusObservation: NSKeyValueObservation?
     
     private let player = AVPlayer(
-        url: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4")!
-    )
+        url: URL(string: "https://devstreaming-cdn.apple.com/videos/streaming/examples/adv_dv_atmos/main.m3u8")!)
     
     var body: some View {
         ZStack {
@@ -43,11 +42,9 @@ struct PlayerView: View {
                         CustomPlayerButton(systemName: isPlaying ? "pause.fill" : "play.fill") {
                             togglePlay()
                         }
-                        
                         CustomPlayerButton(systemName: "goforward.10") { seek(by: 10) }
                     }
                     Spacer()
-                    
                     
                     VideoProgressBar(
                         totalTime: totalTime,
@@ -59,9 +56,7 @@ struct PlayerView: View {
                     )
                 }
             }
-        }
-        
-        .onAppear {
+        } .onAppear {
             enterVideoMode()
             player.play()
             isPlaying = true
@@ -78,7 +73,7 @@ struct PlayerView: View {
                 }
             }
             
-            let interval = CMTime(seconds: 0.5, preferredTimescale: 600)
+            let interval = CMTime(seconds: 1, preferredTimescale: 600)
             timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak player] _ in
                 guard let player = player else { return }
                 currentTime = player.currentTime().seconds

@@ -29,8 +29,7 @@ struct HomeView: View {
                     },
                                onDetailCliked: { movieId in
                         path.append(Route.detail(movieId: movieId))
-                    }
-                    )
+                    })
                     .padding()
                     
                     ForEach(Array(viewModel.genreMovies.keys), id: \.self) { genre in
@@ -47,13 +46,8 @@ struct HomeView: View {
                 }
                 .padding(.bottom, 20)
             }
-            .background(Color("black"))
             .navigationTitle("Home")
-            .background(Color("black"))
             .navigationBarTitleDisplayMode(.large)
-            .toolbarBackground(Color("black").opacity(0.5), for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar{
                 ToolbarItem(placement: .topBarTrailing){
                     Button {

@@ -26,7 +26,6 @@ struct WatchButtons: View {
                     )
                     .background(Color("primary"))
                     .cornerRadius(20)
-                
             }
         }
     }

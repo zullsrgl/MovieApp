@@ -19,7 +19,7 @@ struct VideoProgressBar: View {
                 .fontWeight(.semibold)
                 .foregroundStyle(Color("white"))
                 .frame(width: 44, alignment: .leading)
-
+            
             Slider(
                 value: Binding(
                     get: { currentTime },
@@ -27,7 +27,7 @@ struct VideoProgressBar: View {
                         onSeek(newValue)
                     }
                 ),
-                in: 0...max(totalTime, 1)
+                in: 0...totalTime
             )
             .tint(Color("primary"))
 
@@ -37,7 +37,7 @@ struct VideoProgressBar: View {
                 .foregroundStyle(Color("white"))
                 .frame(width: 44, alignment: .trailing)
         }
-        .padding(.horizontal, 16) 
+        .padding(.horizontal, 16)
         .padding(.bottom, 24)
         .ignoresSafeArea()
     }

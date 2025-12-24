@@ -15,118 +15,39 @@ class MovieService {
     private let baseUrl: String = "https://api.themoviedb.org/3"
     private let apiKey: String = "7e453b0f72f2441f91fecf6a5e810ebc"
     
-    func fetchMovies(completion: @escaping ([Movie]) -> Void) {
-        
+    func fetchMovies() async throws -> [Movie] {
         let urlString = "\(baseUrl)/movie/popular?api_key=\(apiKey)&language=tr-TR"
-        let url = URL(string: urlString)!
-        
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            
-            if let error {
-                print("Error: \(error.localizedDescription)")
-                return
-            }
-            
-            guard let data = data else { return }
-            do {
-                let decodedResponse = try JSONDecoder().decode(MovieResponse.self, from: data)
-                
-                DispatchQueue.main.async {
-                    completion(decodedResponse.results ?? [])
-                }
-                
-            } catch {
-                print("Decoding error: \(error.localizedDescription)")
-            }
-            
-        }.resume()
+        guard let url = URL(string: urlString)  else { throw URLError(.badURL)}
+        let (data, _) = try await URLSession.shared.data(from: url)
+        let moviesResult =  try JSONDecoder().decode(MovieResponse.self, from: data)
+        return moviesResult.results ?? []
     }
     
     
-    func fethMoviesByGenre(genre: MovieGenreType, completion: @escaping(Result<[Movie], Error>) -> Void){
-        
+    func fethMoviesByGenre(genre: MovieGenreType) async throws -> [Movie] {
         let urlString = "\(baseUrl)/discover/movie?api_key=\(apiKey)&language=tr-TR&with_genres=\(genre.rawValue)&sort_by=popularity.desc"
-        guard let url = URL(string: urlString) else { return }
-        
-        URLSession.shared.dataTask(with: url){ data, _ , error in
-            
-            if let error {
-                completion(.failure(error))
-                return
-            }
-            
-            guard let data else { return }
-            
-            do {
-                let response = try JSONDecoder().decode(MovieResponse.self, from: data)
-                
-                DispatchQueue.main.async {
-                    completion(.success(response.results ?? []))
-                }
-                
-            } catch {
-                completion(.failure(error))
-            }
-            
-        }.resume()
+        guard let url = URL(string: urlString) else { throw URLError(.badURL)}
+        let (data, _) = try await URLSession.shared.data(from: url)
+        let moviesResult =  try JSONDecoder().decode(MovieResponse.self, from: data)
+        return moviesResult.results ?? []
     }
     
     
-    func fetchMovieDetails(movieId: Int, completion: @escaping(Result<Movie, Error>) -> Void){
-        
+    func fetchMovieDetails(movieId: Int) async throws -> Movie {
         let urlString = "\(baseUrl)/movie/\(movieId)?api_key=\(apiKey)&language=tr-TR"
-        
-        guard let url = URL(string: urlString) else { return }
-        
-        URLSession.shared.dataTask(with: url){ data, _ , error in
-            
-            if let error {
-                completion(.failure(error))
-                return
-            }
-            
-            guard let data else { return }
-            
-            do {
-                let movie = try JSONDecoder().decode(Movie.self, from: data)
-                DispatchQueue.main.async {
-                    completion(.success(movie))
-                }
-            }
-            catch{
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
-            }
-        }.resume()
+        guard let url = URL(string: urlString) else { throw URLError(.badURL) }
+        let (data, _) = try await URLSession.shared.data(from: url)
+        return try JSONDecoder().decode(Movie.self, from: data)
     }
-    
-    
-    func searchMovies(query: String, completion: @escaping(Result<[Movie], Error>) -> Void) {
+   
+    func searchMovies(query: String) async throws -> [Movie] {
         let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        
-        
-        guard let url = URL(string:"\(baseUrl)/search/movie?api_key=\(apiKey)&language=tr-TR&query=\(encodedQuery)") else { return }
-        URLSession.shared.dataTask(with: url) {data ,_ , error in
-            if let error {
-                completion(.failure(error))
-            }
-            guard let data = data else {
-                print("error: search movies fetched")
-                return
-            }
-            
-            do {
-                let movieResults = try JSONDecoder().decode(MovieResponse.self, from: data)
-                DispatchQueue.main.async {
-                    completion(.success(movieResults.results ?? []))
-                }
-            }catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
-            }
-            
-        }.resume()
+        guard let url = URL(string:"\(baseUrl)/search/movie?api_key=\(apiKey)&language=tr-TR&query=\(encodedQuery)")
+        else {
+            throw URLError(.badURL)
+        }
+        let (data, _) = try await URLSession.shared.data(from: url)
+        let moviesResult = try JSONDecoder().decode(MovieResponse.self , from: data)
+        return moviesResult.results ?? []
     }
 }

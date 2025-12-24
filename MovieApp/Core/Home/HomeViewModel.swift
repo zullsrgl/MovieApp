@@ -13,28 +13,42 @@ final class HomeViewModel: ObservableObject{
     @Published var genreMovies: [MovieGenreType: [Movie]] = [:]
     
     func fetchHomeData() {
-        fetchPopulerMovie()
-        fetchGenres()
-    }
-    
-    
-    private func fetchPopulerMovie() {
-        MovieService.shared.fetchMovies { [weak self] movies in
-            self?.movies = movies
+        Task {
+            await fetchTopMovies()
+            await fetchGenres()
         }
     }
     
-    
-    private func fetchGenres(){
-        let genres = MovieGenreType.allCases.shuffled().prefix(10)
+    @MainActor
+    private func fetchTopMovies() async {
         
-        genres.forEach { genre in
-            MovieService.shared.fethMoviesByGenre(genre: genre) { [weak self] result in
+        do {
+            self.movies = try await MovieService.shared.fetchMovies()
+        }catch {
+            print("search view model error")
+        }
+    }
+    
+    @MainActor
+    private func fetchGenres() async {
+        do {
+            let genres = MovieGenreType.allCases.shuffled().prefix(10)
             
-                if case .success(let movies) = result {
-                    self?.genreMovies[genre] = movies
-                }
+            for genre in genres {
+                let movies = try await MovieService.shared.fethMoviesByGenre(genre: genre)
+                genreMovies[genre] = movies
             }
+            
+        } catch {
+            print("genre fetch error:", error)
+        }
+    }
+    
+    func searchMoviesFetched(searchtext: String) async {
+        do {
+            movies = try await MovieService.shared.searchMovies(query: searchtext)
+        } catch {
+            print("search view model error")
         }
     }
 }

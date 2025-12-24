@@ -10,14 +10,14 @@ import Foundation
 final class DetailViewModel: ObservableObject{
     @Published var movie: Movie?
     
-    func fetchMovieDetail(id: Int) {
-        MovieService.shared.fetchMovieDetails(movieId: id) { result in
-            switch result {
-            case .success(let movie):
-                self.movie = movie
-            case .failure(let error):
-                print("detail view model error: \(error)")
-            }
+    @MainActor
+    func fetchMovieDetail(id: Int)  async {
+        
+        do {
+            movie = try await MovieService.shared.fetchMovieDetails(movieId: id)
+        }
+        catch {
+            print("search view model error")
         }
     }
 }
