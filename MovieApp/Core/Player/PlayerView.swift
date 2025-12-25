@@ -19,6 +19,7 @@ struct PlayerView: View {
     
     @State private var timeObserver: Any?
     @State private var statusObservation: NSKeyValueObservation?
+    @StateObject private var viewModel = PlayerViewModel()
     
     private let player = AVPlayer(
         url: URL(string: "https://devstreaming-cdn.apple.com/videos/streaming/examples/adv_dv_atmos/main.m3u8")!)
@@ -61,6 +62,16 @@ struct PlayerView: View {
                             player.seek(to: time)
                         }, onSpeedTap: {
                             showSpeedMenu = true
+                        }, subtitles: viewModel.subtitleLanguages,
+                        selecedSubTitle: { title in
+                            guard let currentItem = player.currentItem else { return }
+                            if let group = currentItem.asset.mediaSelectionGroup(forMediaCharacteristic: .legible),
+                                 let option = group.options.first(where: { $0.locale?.identifier == title }) {
+                                  currentItem.select(option, in: group)
+                              } else {
+                                  
+                                  currentItem.select(nil, in: currentItem.asset.mediaSelectionGroup(forMediaCharacteristic: .legible)!)
+                              }
                         }
                     )
                     if showSpeedMenu {
@@ -97,6 +108,9 @@ struct PlayerView: View {
             timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak player] _ in
                 guard let player = player else { return }
                 currentTime = player.currentTime().seconds
+            }
+            Task {
+                await viewModel.fetchSubTitles(url: "https://devstreaming-cdn.apple.com/videos/streaming/examples/adv_dv_atmos/main.m3u8")
             }
         }
         .onDisappear {

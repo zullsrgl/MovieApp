@@ -12,8 +12,13 @@ struct VideoProgressBar: View {
     var currentTime: Double
     var onSeek: (Double) -> Void
     var onSpeedTap: () -> Void
+    var subtitles: [String]
+    var selecedSubTitle: (String) -> Void
+    
     @State private var isShowingSpeedSheet = false
-
+    @State private var showSubTitleSheet = false
+    @State private var settingsDetent = PresentationDetent.medium
+    
     
     var body: some View {
         VStack {
@@ -50,8 +55,8 @@ struct VideoProgressBar: View {
         HStack {
             Button(action: {
                 withAnimation {
-                        onSpeedTap()
-                    }
+                    onSpeedTap()
+                }
             }){
                 Image(systemName: "speedometer")
                     .resizable()
@@ -67,20 +72,36 @@ struct VideoProgressBar: View {
             .padding(.horizontal, 60)
             
             Button(action: {
+                showSubTitleSheet = true
             }){
                 Image(systemName: "text.bubble")
                     .resizable()
                     .scaledToFill()
                     .foregroundStyle(Color("white"))
-                
                     .frame(width: 32, height: 32)
                 
                 Text("Subtitle")
                     .font(.headline)
                     .foregroundStyle(Color("white"))
             }
+            .sheet(isPresented: $showSubTitleSheet) {
+                ScrollView {
+                    VStack {
+                        Capsule()
+                            .fill(Color("white").opacity(0.5))
+                            .frame(width: 80, height: 5)
+                            .padding(.top, 8)
+                            .padding(.bottom, 20)
+                      
+                        SubTitlesView(titles: subtitles, subTitleSelected: { title in
+                            selecedSubTitle(title)
+                        })
+                    }
+                }
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+            }
         }
-        .padding(.bottom)
     }
     
     private func formatTime(seconds: Double) -> String {
@@ -93,5 +114,5 @@ struct VideoProgressBar: View {
 }
 
 #Preview {
-    VideoProgressBar(totalTime: 32.54, currentTime: 12.32, onSeek: {_ in }, onSpeedTap: {})
+    VideoProgressBar(totalTime: 32.54, currentTime: 12.32, onSeek: {_ in }, onSpeedTap: {}, subtitles: [], selecedSubTitle: {_ in})
 }

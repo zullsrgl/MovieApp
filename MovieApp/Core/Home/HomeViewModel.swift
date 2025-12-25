@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 final class HomeViewModel: ObservableObject{
     
     @Published var movies: [Movie] = []
@@ -19,7 +20,6 @@ final class HomeViewModel: ObservableObject{
         }
     }
     
-    @MainActor
     private func fetchTopMovies() async {
         do {
             self.movies = try await MovieService.shared.fetchMovies()
@@ -28,7 +28,6 @@ final class HomeViewModel: ObservableObject{
         }
     }
     
-    @MainActor
     private func fetchGenres() async {
         do {
             let genres = MovieGenreType.allCases.shuffled().prefix(10)
