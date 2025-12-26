@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct MovieInformation: View {
-    
     let text: String
     @State private var expanded = false
     let lineLimit: Int = 3
@@ -16,22 +15,19 @@ struct MovieInformation: View {
     var body: some View {
         
         VStack(alignment: .leading){
-            Text(text)
-                .foregroundColor(Color("white"))
-                .font(.subheadline)
-                .lineLimit(expanded ? nil : lineLimit)
-                .padding(.horizontal)
-            
-            if !expanded{
-                Button("Read More"){
-                    expanded = true
+            if !text.isEmpty {
+                Text(text)
+                    .foregroundColor(Color("white"))
+                    .font(.subheadline)
+                    .lineLimit(expanded ? nil : lineLimit)
+                    .padding(.horizontal)
+                
+                if text.count > 150 {
+                    Button(expanded ? "Less" : "Read More"){
+                        expanded.toggle()
+                    }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
-            }else {
-                Button("Less"){
-                    expanded = false
-                }
-                .padding(.horizontal)
             }
         }
     }

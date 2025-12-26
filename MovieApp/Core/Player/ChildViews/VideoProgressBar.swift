@@ -15,6 +15,7 @@ struct VideoProgressBar: View {
     var subtitles: [String]
     var selecedSubTitle: (String) -> Void
     
+    @State private var selectedSubtitleCode: String?
     @State private var isShowingSpeedSheet = false
     @State private var showSubTitleSheet = false
     @State private var settingsDetent = PresentationDetent.medium
@@ -85,21 +86,23 @@ struct VideoProgressBar: View {
                     .foregroundStyle(Color("white"))
             }
             .sheet(isPresented: $showSubTitleSheet) {
-                ScrollView {
-                    VStack {
-                        Capsule()
-                            .fill(Color("white").opacity(0.5))
-                            .frame(width: 80, height: 5)
-                            .padding(.top, 8)
-                            .padding(.bottom, 20)
-                      
-                        SubTitlesView(titles: subtitles, subTitleSelected: { title in
+
+                VStack {
+                    Capsule()
+                        .fill(Color.white.opacity(0.5))
+                        .frame(width: 80, height: 5)
+                        .padding(.top, 8)
+                        .padding(.bottom, 20)
+
+                    SubTitlesView(
+                        titles: subtitles,
+                        subTitleSelected: { title in
                             selecedSubTitle(title)
-                        })
-                    }
+                        }, selectedLanguage: $selectedSubtitleCode
+                    )
                 }
                 .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
+                
             }
         }
     }

@@ -8,10 +8,9 @@
 import SwiftUI
 
 struct MovieDetailHeaderView: View {
-    
     let movie: Movie
-    
     var body: some View {
+        
         ZStack(alignment: .bottomLeading) {
             if let posterPath = movie.posterPath {
                 AsyncImage(
@@ -35,8 +34,6 @@ struct MovieDetailHeaderView: View {
                 }
                 
             }
-            
-            
             
             VStack(alignment: .leading) {
                 if let posterPath = movie.posterPath {
@@ -67,8 +64,6 @@ struct MovieDetailHeaderView: View {
                         
                     }
                 }
-                
-                
                 if let title = movie.title {
                     Text(title)
                         .font(.title2)
@@ -76,11 +71,9 @@ struct MovieDetailHeaderView: View {
                         .fontWeight(.semibold)
                 }
                 
-                
                 HStack(spacing: 8) {
                     Image(systemName: "star.fill")
                         .foregroundColor(Color("primary"))
-                    
                     
                     if let voteAverage = movie.voteAverage {
                         Text("\(voteAverage)")
@@ -104,9 +97,8 @@ struct MovieDetailHeaderView: View {
             .padding()
         }
     }
-    
 }
 
 #Preview {
-    MovieDetailHeaderView(movie: Movie(id: 2, title: "", originalTitle: "", overview: "", posterPath: "", backdropPath: "", releaseDate: "", voteAverage: 12.7, voteCount: 2, genreIds: []))
+    MovieDetailHeaderView(movie: Movie(id: 2, title: "", originalTitle: "", overview: "", posterPath: "https://image.tmdb.org/t/p/w500/dys7EksOQd1ej4jWmi503kEmSBP.jpg", backdropPath: "", releaseDate: "", voteAverage: 12.7, voteCount: 2, genreIds: []))
 }
