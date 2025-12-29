@@ -8,15 +8,13 @@
 import SwiftUI
 import AVKit
 
+
 struct PlayerView: View {
     @State private var showControls = true
-    @State private var showSpeedMenu = false
     @State private var selectedRateIndex = 2
-    
-    @State var isPlaying: Bool = false
+    @State private var isPlaying: Bool = false
     @State private var currentTime: Double = 0.0
     @State private var totalTime: Double =  1
-    
     @State private var timeObserver: Any?
     @State private var statusObservation: NSKeyValueObservation?
     @StateObject private var viewModel = PlayerViewModel()
@@ -28,6 +26,7 @@ struct PlayerView: View {
         ZStack {
             Color("black")
                 .ignoresSafeArea()
+            
             PlayerLayerView(player: player)
                 .ignoresSafeArea()
                 .onTapGesture {
@@ -42,98 +41,98 @@ struct PlayerView: View {
                 .allowsHitTesting(false)
             
             if showControls {
-                VStack {
+                VStack{
                     Spacer()
                     HStack(spacing: 100) {
-                        CustomPlayerButton(systemName: "gobackward.10") { seek(by: -10) }
-                        
-                        CustomPlayerButton(systemName: isPlaying ? "pause.fill" : "play.fill") {
-                            togglePlay()
+                        CustomPlayerButton(systemName: "gobackward.10") {
+                            seek(by: -10)
                         }
-                        CustomPlayerButton(systemName: "goforward.10") { seek(by: 10) }
+                        CustomPlayerButton(systemName: isPlaying ? "pause.fill" : "play.fill") {
+                            isPlaying ? player.pause() : player.play()
+                            isPlaying.toggle()
+                            
+                        }
+                        CustomPlayerButton(systemName: "goforward.10") {
+                            seek(by: 10)
+                        }
                     }
+                    
                     Spacer()
                     
-                    VideoProgressBar(
+                    ProgressBarView(
                         totalTime: totalTime,
                         currentTime: currentTime,
                         onSeek: { seconds in
                             let time = CMTime(seconds: seconds, preferredTimescale: 600)
                             player.seek(to: time)
-                        }, onSpeedTap: {
-                            showSpeedMenu = true
-                        }, subtitles: viewModel.subtitleLanguages,
-                        selecedSubTitle: { title in
-                            guard let currentItem = player.currentItem else { return }
-                            if let group = currentItem.asset.mediaSelectionGroup(forMediaCharacteristic: .legible),
-                                 let option = group.options.first(where: { $0.locale?.identifier == title }) {
-                                  currentItem.select(option, in: group)
-                              } else {
-                                  
-                                  currentItem.select(nil, in: currentItem.asset.mediaSelectionGroup(forMediaCharacteristic: .legible)!)
-                              }
-                        }
+                        },
+                        subtitles: viewModel.subtitleOptions,
+                        
+                        selecedSubTitle: { option in
+                            selectSubtitle(option: option)
+                        },
+                        speedIndexSelected: { index in
+                            player.rate = index
+                        },
+                        rateIndex: $selectedRateIndex
                     )
-                    if showSpeedMenu {
-                        PlaybackSpeedView(rateIndex: $selectedRateIndex, onSelect: { selectedRate in
-                            player.rate = selectedRate
-                        }, onClose: {
-                            withAnimation {
-                                showSpeedMenu = false
-                            }
-                        })
-                        .transition(.move(edge: .bottom))
-                    }
                 }
-                .transition(.opacity)
             }
-        } .onAppear {
+        }
+        .onAppear{
             enterVideoMode()
             player.play()
             isPlaying = true
+            avPlayerDuration()
+            avPlayerCurrentTime()
             
-            if let duration = player.currentItem?.duration, duration.isNumeric {
-                totalTime = duration.seconds
-            } else {
-                statusObservation = player.currentItem?.observe(\AVPlayerItem.status, options: [.initial, .new]) { item, _ in
-                    if item.status == .readyToPlay, item.duration.isNumeric {
-                        DispatchQueue.main.async {
-                            totalTime = item.duration.seconds
-                        }
-                    }
-                }
-            }
-            
-            let interval = CMTime(seconds: 1, preferredTimescale: 600)
-            timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak player] _ in
-                guard let player = player else { return }
-                currentTime = player.currentTime().seconds
-            }
             Task {
-                await viewModel.fetchSubTitles(url: "https://devstreaming-cdn.apple.com/videos/streaming/examples/adv_dv_atmos/main.m3u8")
+                await viewModel.loadSubtitles(player: player)
             }
+            
         }
-        .onDisappear {
+        .onDisappear{
             exitVideoMode()
             player.pause()
+            isPlaying = false
             if let observer = timeObserver {
                 player.removeTimeObserver(observer)
-                timeObserver = nil
             }
-            statusObservation?.invalidate()
-            statusObservation = nil
+        }
+        .navigationBarBackButtonHidden(!showControls)
+    }
+    
+    private func selectSubtitle(option: AVMediaSelectionOption?){
+        guard let currentItem = player.currentItem,
+              let group = currentItem.asset
+            .mediaSelectionGroup(forMediaCharacteristic: .legible) else { return }
+        if let option {
+            currentItem.select(option, in: group)
+        } else {
+            currentItem.select(nil, in: group)
         }
     }
     
-    private func togglePlay(){
-        if isPlaying {
-            player.pause()
+    private func avPlayerDuration() {
+        if let duration = player.currentItem?.duration, duration.isNumeric{
+            totalTime = duration.seconds
         }else {
-            player.play()
+            statusObservation = player.currentItem?.observe(\AVPlayerItem.status, options: [.initial, .new]) { item, _ in
+                if item.status == .readyToPlay,
+                   item.duration.isNumeric {
+                    totalTime = item.duration.seconds
+                }
+            }
         }
-        isPlaying.toggle()
     }
     
+    private func avPlayerCurrentTime() {
+        let interval = CMTime(seconds: 1, preferredTimescale: 600)
+        timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { time in
+            self.currentTime = time.seconds
+            
+        }
+    }
     
     private func seek(by seconds: Double) {
         let currentTime = player.currentTime()

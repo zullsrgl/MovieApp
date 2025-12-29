@@ -6,18 +6,22 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 @MainActor
 final class PlayerViewModel: ObservableObject {
     
-    @Published var subtitleLanguages: [String] = []
-  
-    func fetchSubTitles(url : String) async {
+    @Published var subtitleOptions: [AVMediaSelectionOption] = []
+    
+    func loadSubtitles(player: AVPlayer) async {
+        guard let item = player.currentItem else { return }
         do {
-            subtitleLanguages =  try await MovieService.shared.fetchSubtitleLanguages(url: url)
+            let group = try await item.asset.loadMediaSelectionGroup(for: .legible)
+            await MainActor.run {
+                self.subtitleOptions = group?.options ?? []
+            }
         }catch {
-            print("player viewModel error")
+            print("Subtitle load error:", error)
         }
-        
     }
 }

@@ -48,28 +48,4 @@ class MovieService {
         let moviesResult = try JSONDecoder().decode(MovieResponse.self , from: data)
         return moviesResult.results ?? []
     }
-    
-    func fetchSubtitleLanguages(url: String) async throws -> [String] {
-        guard let url = URL(string: url) else { return [] }
-
-        let (data, _) = try await URLSession.shared.data(from: url)
-        guard let content = String(data: data, encoding: .utf8) else { return [] }
-
-        let lines = content.components(separatedBy: "\n")
-        let subtitleLines = lines.filter { $0.starts(with: "#EXT-X-MEDIA:TYPE=SUBTITLES") }
-
-        var languages: Set<String> = []
-
-        for line in subtitleLines {
-            if let langPart = line.split(separator: ",").first(where: { $0.contains("URI=") }) {
-                
-                let uri = langPart.replacingOccurrences(of: "URI=", with: "").replacingOccurrences(of: "\"", with: "")
-                if let match = uri.split(separator: "_").first(where: { $0.contains("fr") || $0.contains("en") || $0.contains("cmn") }) {
-                    let code = String(match)
-                    languages.insert(code)
-                }
-            }
-        }
-        return Array(languages) 
-    }
 }

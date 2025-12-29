@@ -8,36 +8,17 @@
 import SwiftUI
 import AVFoundation
 
-enum LanguageNames {
-    static func name(for code: String) -> String {
-        switch code {
-        case "fr", "fr-FR":
-            return "French"
-        case "fr-CA":
-            return "French(Canada)"
-        case "en":
-            return "English"
-        case "cmn-Hans":
-            return "Chinese(Simplified)"
-        case "cmn-Hant":
-            return "Chinese(Traditional)"
-        default:
-            return Locale.current.localizedString(forIdentifier: code) ?? code
-        }
-    }
-}
-
 struct SubTitlesView: View {
-    var titles: [String]
-    var subTitleSelected: (String) -> Void
+    var subtitles: [AVMediaSelectionOption]
+    var selectedSubtitle: (AVMediaSelectionOption?) -> Void
     
-    @Binding var selectedLanguage: String?
+    @Binding var selectedLanguage: AVMediaSelectionOption?
     
     var body: some View {
         List {
             Button {
                 selectedLanguage = nil
-                subTitleSelected("off")
+                selectedSubtitle(nil)
             } label: {
                 HStack {
                     Text("Subtitles Off")
@@ -48,23 +29,23 @@ struct SubTitlesView: View {
                 }
             }
             
-            ForEach(titles, id: \.self) { code in
-                let title = LanguageNames.name(for: code)
-                
-                Button {
-                    selectedLanguage = code
-                    subTitleSelected(code)
-                } label: {
-                    HStack {
-                        Text(title)
-                        Spacer()
-                        if selectedLanguage == code {
-                            Image(systemName: "checkmark")
-                        }
-                    }
-                }
-            }
-        }
+            ForEach(subtitles, id: \.self) { option in
+                  let title = option.displayName
+
+                  Button {
+                      selectedLanguage = option
+                      selectedSubtitle(option)
+                  } label: {
+                      HStack {
+                          Text(title)
+                          Spacer()
+                          if selectedLanguage == option {
+                              Image(systemName: "checkmark")
+                          }
+                      }
+                  }
+              }
+          }
         .listStyle(.plain)
         .background(Color.black)
         .onAppear{
@@ -73,5 +54,5 @@ struct SubTitlesView: View {
 }
 
 #Preview {
-    //    SubTitlesView(titles: [], subTitleSelected: {_ in}, selectedLanguage: )
+    SubTitlesView(subtitles: [], selectedSubtitle: {_ in }, selectedLanguage: .constant(nil))
 }
