@@ -10,16 +10,21 @@ import AVFoundation
 
 struct ProgressBarView: View {
     var totalTime: Double
-    var currentTime: Double
+    var resolutions: [(String, Double)]
+    var resolutionsSelected: (Double) -> Void
     var onSeek: (Double) -> Void
     var subtitles: [AVMediaSelectionOption]
-    var selecedSubTitle: (AVMediaSelectionOption) -> Void
+    var selecedSubTitle: (AVMediaSelectionOption?) -> Void
     var speedIndexSelected: (Float) -> Void
+    
     @Binding var rateIndex: Int
+    @Binding var currentTime: Double
+    @Binding var selectedResolution: String?
     
     @State private var selectedSubtitle: AVMediaSelectionOption?
     @State private var showSubTitleSheet = false
     @State private var showSpeetTapped = false
+    @State private var showResolutionTapped = false
     @State private var editingValue: Double? = nil
     
     var body: some View {
@@ -42,6 +47,7 @@ struct ProgressBarView: View {
                     onEditingChanged: { editing in
                         if !editing {
                             if let value = editingValue {
+                                currentTime = value
                                 onSeek(value)
                             }
                             editingValue = nil
@@ -57,7 +63,7 @@ struct ProgressBarView: View {
             }
             .ignoresSafeArea()
             
-            HStack{
+            HStack(spacing: 32){
                 Button(action: {
                     showSpeetTapped = true
                 }){
@@ -71,7 +77,6 @@ struct ProgressBarView: View {
                         .font(.headline)
                         .foregroundStyle(Color("white"))
                 }
-                .padding(.horizontal, 60)
                 .sheet(isPresented:  $showSpeetTapped){
                     
                     Capsule()
@@ -110,13 +115,43 @@ struct ProgressBarView: View {
                         SubTitlesView(
                             subtitles: subtitles,
                             selectedSubtitle: { option in
-                                guard let option = option else { return}
-                                selecedSubTitle(option)
+                                selecedSubTitle(option ?? nil)
                                 
                             },
                             selectedLanguage: $selectedSubtitle
                         )
                         .frame(maxHeight: .infinity)
+                    }
+                }
+                
+                Button(action: {
+                    showResolutionTapped = true
+                    
+                }){
+                    Image(systemName: "gear")
+                        .resizable()
+                        .scaledToFill()
+                        .foregroundStyle(Color("white"))
+                        .frame(width: 32, height: 32)
+                    
+                    Text("Settings")
+                        .font(.headline)
+                        .foregroundStyle(Color("white"))
+                }
+                .sheet(isPresented: $showResolutionTapped) {
+                    VStack {
+                        Capsule()
+                            .fill(Color.white.opacity(0.5))
+                            .frame(width: 80, height: 5)
+                            .padding(.top, 8)
+                            .padding(.bottom, 20)
+                        ResolutionListView(
+                            resolutions: resolutions,
+                            resolutionsSelected: { value in
+                                resolutionsSelected(value)
+                            },
+                            selectedResolution: $selectedResolution
+                        )
                     }
                 }
             }
@@ -133,5 +168,5 @@ struct ProgressBarView: View {
 }
 
 #Preview {
-    ProgressBarView(totalTime: 12.3, currentTime: 21.3, onSeek: {_ in}, subtitles: [], selecedSubTitle: {_ in}, speedIndexSelected: {_ in}, rateIndex: .constant(9))
+    ProgressBarView(totalTime: 12.3, resolutions: [],resolutionsSelected: {_ in} , onSeek: {_ in}, subtitles: [], selecedSubTitle:  {_ in}, speedIndexSelected: {_ in}, rateIndex: .constant(9), currentTime: .constant(0.43), selectedResolution: .constant(nil))
 }

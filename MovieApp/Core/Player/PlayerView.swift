@@ -14,13 +14,14 @@ struct PlayerView: View {
     @State private var selectedRateIndex = 2
     @State private var isPlaying: Bool = false
     @State private var currentTime: Double = 0.0
-    @State private var totalTime: Double =  1
+    @State private var totalTime: Double =  0.0
     @State private var timeObserver: Any?
     @State private var statusObservation: NSKeyValueObservation?
+    @State private var selectedResulation: String?
     @StateObject private var viewModel = PlayerViewModel()
     
     private let player = AVPlayer(
-        url: URL(string: "https://devstreaming-cdn.apple.com/videos/streaming/examples/adv_dv_atmos/main.m3u8")!)
+        url: URL(string: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8")!)
     
     var body: some View {
         ZStack {
@@ -58,23 +59,29 @@ struct PlayerView: View {
                     }
                     
                     Spacer()
-                    
                     ProgressBarView(
                         totalTime: totalTime,
-                        currentTime: currentTime,
-                        onSeek: { seconds in
-                            let time = CMTime(seconds: seconds, preferredTimescale: 600)
-                            player.seek(to: time)
-                        },
-                        subtitles: viewModel.subtitleOptions,
+                        resolutions: viewModel.resolutions,
+                        resolutionsSelected: { bitrate in
+                            player.currentItem?.preferredPeakBitRate = bitrate
+                            selectedResulation = String(bitrate)
+                            print("bitrate: \(bitrate)")
                         
-                        selecedSubTitle: { option in
-                            selectSubtitle(option: option)
-                        },
+                    },
+                        onSeek: { seconds in
+                        let time = CMTime(seconds: seconds, preferredTimescale: 600)
+                        player.seek(to: time)
+                    },
+                        subtitles: viewModel.subtitleOptions,
+                                    selecedSubTitle: { option in
+                        selectSubtitle(option: option)
+                    },
                         speedIndexSelected: { index in
-                            player.rate = index
-                        },
-                        rateIndex: $selectedRateIndex
+                        player.rate = index
+                    },
+                        rateIndex: $selectedRateIndex,
+                        currentTime: $currentTime,
+                        selectedResolution: $selectedResulation
                     )
                 }
             }
@@ -85,11 +92,10 @@ struct PlayerView: View {
             isPlaying = true
             avPlayerDuration()
             avPlayerCurrentTime()
-            
             Task {
                 await viewModel.loadSubtitles(player: player)
+                await viewModel.fetchAvailableResolutions(player: player)
             }
-            
         }
         .onDisappear{
             exitVideoMode()
@@ -97,6 +103,8 @@ struct PlayerView: View {
             isPlaying = false
             if let observer = timeObserver {
                 player.removeTimeObserver(observer)
+                timeObserver = nil
+                
             }
         }
         .navigationBarBackButtonHidden(!showControls)
@@ -127,10 +135,9 @@ struct PlayerView: View {
     }
     
     private func avPlayerCurrentTime() {
-        let interval = CMTime(seconds: 1, preferredTimescale: 600)
+        let interval = CMTime(seconds: 0.5, preferredTimescale: 600)
         timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { time in
             self.currentTime = time.seconds
-            
         }
     }
     
@@ -152,8 +159,8 @@ struct PlayerView: View {
         UIDevice.current.setValue(  UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
         UINavigationController.attemptRotationToDeviceOrientation()
     }
-    
 }
+
 #Preview {
     PlayerView()
 }

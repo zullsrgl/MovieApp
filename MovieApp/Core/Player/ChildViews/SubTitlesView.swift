@@ -21,7 +21,7 @@ struct SubTitlesView: View {
                 selectedSubtitle(nil)
             } label: {
                 HStack {
-                    Text("Subtitles Off")
+                    Text("Subtitl Off")
                     Spacer()
                     if selectedLanguage == nil {
                         Image(systemName: "checkmark")
